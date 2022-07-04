@@ -15,46 +15,57 @@ const gameBoard = (() => {
                 column.className = `columns ${arrayNum}`;
                 column.id = arrayNum;
                 row.appendChild(column);
-                column.addEventListener('mousedown', testFunction);         
+                column.addEventListener('mousedown', () => gameFlow.playerAction(column.id));         
                 arrayNum++;
                 iColumn++;
             }
         iRow++;
         };
     };
+
     const boardState = [                // will use this array to check the board state and declare game state
         '', '', '',
         '', '', '',
         '', '', ''
     ];
 
-    return {generateGrid, boardState};
+    const checkBoardState = () => {
+        console.log('board state check');
+    }
+
+    return {generateGrid, boardState, checkBoardState};
 })();
 
-const testFunction = () => {
-    console.log('test');
-}
 
 // dictate player turn order and assigning either a O or X based on turn order. follows a simple toggle
 const gameFlow = (() => {
+    turn = ''
     let i = 0;
     const turnOrder = () => {
         let turnText = document.querySelector('#turnTextBox');
-        if (i % 2 === 0){
+        if ((i % 2) === 0){
             turnText.textContent = `${playerOne}'s Turn!`;
-        } else{
+            turn = playerOne;
+        } else {
             turnText.textContent = `${playerTwo}'s Turn!`;
+            turn = playerTwo;
         }
-        i++
+        i++;
     }
 
-    const playerAction = (num) => {
-        if (i % 2 === 0){
-            console.log(num);
+    const playerAction = num => {
+        if (gameBoard.boardState[num]){
+            return;
+        } else if (turn === playerOne){
+            document.getElementById(num).textContent = 'X';
+            gameBoard.boardState[num] = 'X';
+        } else {
+            document.getElementById(num).textContent = 'O';
+            gameBoard.boardState[num] = 'O';
         }
+        gameBoard.checkBoardState();
         turnOrder();
     }
-    console.log(i);
     return {turnOrder, playerAction};
 })();
 
