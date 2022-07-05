@@ -1,7 +1,8 @@
 const restartBtn = document.querySelector('#restart');
 
-
+// gameBoard Factory
 const gameBoard = (() => {
+    // function that generates the grid area
     const generateGrid = () => {
         const playGrid = document.querySelector('#playGrid');
     
@@ -26,6 +27,7 @@ const gameBoard = (() => {
         };
     };
 
+    //function that checks the board state and possible win conditions
     const checkBoardState = () => {
         let i = 0;
 
@@ -58,10 +60,10 @@ const gameBoard = (() => {
     return {generateGrid, checkBoardState};
 })();
 
-
-// dictate player turn order and assigning either a O or X based on turn order. follows a simple toggle
 const gameFlow = (() => {
     let i = 0;
+
+    // assigns the turn order based on a simple toggle. this turn order then allows either an X or O to be placed.
     const turnOrder = () => {
         let turnText = document.querySelector('#turnTextBox');
         if ((i % 2) === 0){
@@ -74,6 +76,7 @@ const gameFlow = (() => {
         i++;
     }
     
+    // based on turn order, amends the playgrid div with an "X" or "O". boardstate is checked after each piece is placed.
     const playerAction = (num) => {
         if (boardState[num]){
             return;
@@ -88,6 +91,7 @@ const gameFlow = (() => {
         turnOrder();
     }
 
+    // resets the board
     const clearBoard = () => {
         let allGrid = document.querySelectorAll('.columns');
         allGrid.forEach((item) => {
