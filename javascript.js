@@ -15,7 +15,7 @@ const gameBoard = (() => {
     
             let iColumn = 0;
             while (iColumn < 3){
-                const column = document.createElement('div');
+                const column = document.createElement('img');
                 column.className = `columns ${arrayNum}`;
                 column.id = arrayNum;
                 row.appendChild(column);
@@ -81,10 +81,10 @@ const gameFlow = (() => {
         if (boardState[num]){
             return;
         } else if (turnTracker === 'X'){
-            document.getElementById(num).textContent = 'X';
+            document.getElementById(num).setAttribute('src', './Icons/x_icon.png');
             boardState[num] = 'X';
         } else {
-            document.getElementById(num).textContent = 'O';
+            document.getElementById(num).setAttribute('src', './Icons/o_icon2.png');
             boardState[num] = 'O';
         }
         gameBoard.checkBoardState();

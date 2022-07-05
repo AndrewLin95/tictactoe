@@ -50,12 +50,17 @@ table {
 body{
     display: flex;
     flex-direction: column;
+    background-color: #cfd8dc;
 }
 
 #header{
-    border:solid black 1px;
+    background-color: #90a4ae;
     height: 15vh;
     width: 99.9vw;
+}
+
+#title{
+    font-size: 5em;
 }
 
 #turnTextBox,
@@ -75,9 +80,19 @@ body{
 
 .rows,
 .columns{
-    border: black solid 1px;
+    border: solid 1px lightgrey;
+    background-color: white;
     width: 10em;
     height: 10em;
+    max-width: 10em;
+    max-height: 10em;
+}
+
+.columns{
+    display: flex;
+    flex-direction: center;
+    justify-content: center;
+    align-items: center;
 }
 
 #restart{
