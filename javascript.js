@@ -56,7 +56,6 @@ const gameBoard = (() => {
         }
         i = 0;
     }
-
     return {generateGrid, checkBoardState};
 })();
 
