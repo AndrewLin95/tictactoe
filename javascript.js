@@ -1,3 +1,6 @@
+const restartBtn = document.querySelector('#restart');
+
+
 const gameBoard = (() => {
     const generateGrid = () => {
         const playGrid = document.querySelector('#playGrid');
@@ -23,56 +26,97 @@ const gameBoard = (() => {
         };
     };
 
-    const boardState = [                // will use this array to check the board state and declare game state
-        '', '', '',
-        '', '', '',
-        '', '', ''
-    ];
-
     const checkBoardState = () => {
-        console.log('board state check');
+        let i = 0;
+
+        let playerName = '';
+        if (turnTracker = 'X'){ 
+            playerName = 'player One'
+        } else {
+            playerName = 'player Two'
+        }
+
+        while (i < 9){
+            if (boardState[i] === turnTracker && boardState[i+1] === turnTracker  && boardState[i+2] === turnTracker){   //check columns
+                alert(`${playerName} wins!`)
+                gameFlow.clearBoard();
+            } else if (boardState[i] === turnTracker && boardState[i+3] === turnTracker && boardState[i+6] === turnTracker){  //check rows
+                alert(`${playerName} wins!`)
+                gameFlow.clearBoard();
+            } else if (boardState[0] === turnTracker && boardState[4] === turnTracker && boardState[8] === turnTracker){
+                alert(`${playerName} wins!`)
+                gameFlow.clearBoard();
+            } else if (boardState[2] === turnTracker && boardState[4] === turnTracker && boardState[6] === turnTracker){
+                alert(`${playerName} wins!`)
+                gameFlow.clearBoard();
+            }
+            i += 3;
+        }
+        i = 0;
     }
 
-    return {generateGrid, boardState, checkBoardState};
+    return {generateGrid, checkBoardState};
 })();
 
 
 // dictate player turn order and assigning either a O or X based on turn order. follows a simple toggle
 const gameFlow = (() => {
-    turn = ''
     let i = 0;
     const turnOrder = () => {
         let turnText = document.querySelector('#turnTextBox');
         if ((i % 2) === 0){
             turnText.textContent = `${playerOne}'s Turn!`;
-            turn = playerOne;
+            turnTracker = 'X';
         } else {
             turnText.textContent = `${playerTwo}'s Turn!`;
-            turn = playerTwo;
+            turnTracker = 'O';
         }
         i++;
     }
-
-    const playerAction = num => {
-        if (gameBoard.boardState[num]){
+    
+    const playerAction = (num) => {
+        if (boardState[num]){
             return;
-        } else if (turn === playerOne){
+        } else if (turnTracker === 'X'){
             document.getElementById(num).textContent = 'X';
-            gameBoard.boardState[num] = 'X';
+            boardState[num] = 'X';
         } else {
             document.getElementById(num).textContent = 'O';
-            gameBoard.boardState[num] = 'O';
+            boardState[num] = 'O';
         }
         gameBoard.checkBoardState();
         turnOrder();
     }
-    return {turnOrder, playerAction};
+
+    const clearBoard = () => {
+        let allGrid = document.querySelectorAll('.columns');
+        allGrid.forEach((item) => {
+            item.textContent = '';
+        })
+        i = 0;
+        boardState = [               
+        '', '', '',
+        '', '', '',
+        '', '', ''
+        ];
+        turnOrder();
+    }
+
+    return {turnOrder, playerAction, clearBoard};
 })();
 
+let turnTracker = 'X';      // default is X to start
+
+let boardState = [                // will use this array to check the board state and declare game state
+'', '', '',
+'', '', '',
+'', '', ''
+];
+
+restartBtn.addEventListener('click', gameFlow.clearBoard);
 
 const playerOne = 'Player One';
 const playerTwo = 'Player Two';
 
 gameBoard.generateGrid();
 gameFlow.turnOrder();
-console.log(gameBoard.boardState);
