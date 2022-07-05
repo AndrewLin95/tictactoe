@@ -95,7 +95,7 @@ const gameFlow = (() => {
     const clearBoard = () => {
         let allGrid = document.querySelectorAll('.columns');
         allGrid.forEach((item) => {
-            item.textContent = '';
+            item.setAttribute('src', './Icons/blank.png');
         })
         i = 0;
         boardState = [               
