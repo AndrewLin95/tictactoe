@@ -72,10 +72,31 @@ body{
     margin: 3vh;
 }
 
+#middleGroup{
+    display:flex;
+    justify-content: center;
+}
+
 #playGrid{
     display: flex;
     justify-content: center;
     height: 30em;
+}
+
+#playerSelect,
+#scoreBoard{
+    display:flex;
+    flex-direction: column;  
+    justify-content: center;
+    width: 15em;
+}
+
+#playerSelect{
+    margin-left: 5em;
+}
+
+#scoreBoard{
+    margin-right: 5em;
 }
 
 .rows,
