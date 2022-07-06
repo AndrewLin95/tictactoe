@@ -11,35 +11,15 @@ const GameBoard = (() => {
         boardState[num] = input;
     }
 
-    const checkWinState = () => {
-        let i = 0;
-
-        let playerName = '';
-        if (turnTracker = 'X'){ 
-            playerName = 'player One'
-        } else {
-            playerName = 'player Two'
-        }
-
-        while (i < 9){
-            if (boardState[i] === turnTracker && boardState[i+1] === turnTracker  && boardState[i+2] === turnTracker){   //check columns
-                alert(`${playerName} wins!`)
-                gameFlow.clearBoard();
-            } else if (boardState[i] === turnTracker && boardState[i+3] === turnTracker && boardState[i+6] === turnTracker){  //check rows
-                alert(`${playerName} wins!`)
-                gameFlow.clearBoard();
-            } else if (boardState[0] === turnTracker && boardState[4] === turnTracker && boardState[8] === turnTracker){
-                alert(`${playerName} wins!`)
-                gameFlow.clearBoard();
-            } else if (boardState[2] === turnTracker && boardState[4] === turnTracker && boardState[6] === turnTracker){
-                alert(`${playerName} wins!`)
-                gameFlow.clearBoard();
-            }
-            i += 3;
-        }
-        i = 0;
+    const resetBoardState = () => {
+        boardState = [              
+        '', '', '',
+        '', '', '',
+        '', '', ''
+        ];
     }
-    return {updateBoardState, checkWinState, boardState};
+
+    return {updateBoardState, boardState, resetBoardState};
 })();
 
 //factory for the players
@@ -55,19 +35,64 @@ const gameFlow = (() => {
     let i = 0;
     // assigns the turn order based on a simple toggle. this turn order then allows either an X or O to be placed.
     const turnOrder = (columnID) => {
-        if(GameBoard.boardState === '' && (i % 2) === 0){
-            GameBoard.updateBoardState(columnID, playerOne.getSymbol);
-            
+        if (GameBoard.boardState[columnID] || winState){
+            return;
+        } else if ((i % 2) === 0){
+            GameBoard.updateBoardState(columnID, playerOne.getSymbol());
+            displayController.updateGrid(columnID, playerOne.getSymbol(), playerTwo.getUserName());
+            checkWinState(playerOne.getUserName(), playerOne.getSymbol());
         } else {
-
+            GameBoard.updateBoardState(columnID, playerTwo.getSymbol());
+            displayController.updateGrid(columnID, playerTwo.getSymbol(), playerOne.getUserName());
+            checkWinState(playerTwo.getUserName(), playerTwo.getSymbol());
         }
         i++;
+
+        if (i === 9 && !winState){
+            displayController.updateText('draw');
+        }
     }
-    return {turnOrder};
+
+    let winState = false;
+    const checkWinState = (playerName, symbol) => {
+        let i = 0;
+        let iR = 0;
+        while (i < 9){
+            if (GameBoard.boardState[i] === symbol && GameBoard.boardState[i+1] === symbol  && GameBoard.boardState[i+2] === symbol){   //check columns
+                displayController.updateText(playerName);
+                winState = true;
+            } else if (GameBoard.boardState[iR] === symbol && GameBoard.boardState[iR+3] === symbol && GameBoard.boardState[iR+6] === symbol){  //check rows
+                displayController.updateText(playerName);
+                winState = true;
+            } else if (GameBoard.boardState[0] === symbol && GameBoard.boardState[4] === symbol && GameBoard.boardState[8] === symbol){
+                displayController.updateText(playerName);
+                winState = true;
+            } else if (GameBoard.boardState[2] === symbol && GameBoard.boardState[4] === symbol && GameBoard.boardState[6] === symbol){
+                displayController.updateText(playerName);
+                winState = true;
+            }
+            i += 3;
+            iR++;
+        }
+        i = 0;
+    }
+
+    const restartGame = () => {
+        i = 0;
+        winState = false;
+
+        let allGrid = document.querySelectorAll('.columns');
+        allGrid.forEach((item) => {
+            item.setAttribute('src', './Icons/blank.png');
+        })
+    }
+    return {turnOrder, restartGame};
 })();
 
 // module for displayController
 const displayController = (() => {
+    const turnText = document.querySelector('#turnTextBox');
+    
     // function to generate Grid
     const generateGrid = () => {
         const playGrid = document.querySelector('#playGrid');
@@ -93,22 +118,35 @@ const displayController = (() => {
         };
     }
 
+    // function to update the grid with the symbols
+    const updateGrid = (columnID, symbol, playerName) => {
+        document.getElementById(columnID).setAttribute('src', `./Icons/${symbol}_icon.png`);
+        turnText.textContent = `${playerName}'s turn`;
+    }
+
+    const updateText = (name) => {
+        if (name === 'draw'){
+            turnText.textContent = `Draw!`;
+        } else {
+            turnText.textContent = `${name} wins!`;
+        }
+    }
 
     // restart game button
     const restartBtn = document.querySelector('#restart');
     restartBtn.addEventListener('click', () => {
-
+        gameFlow.restartGame();
+        GameBoard.resetBoardState();
     });
 
     // start game button
     const startGameBtn = document.querySelector('#startGame');
-    const turnText = document.querySelector('#turnTextBox');
     startGameBtn.addEventListener('click', () => {
         generateGrid();
         turnText.textContent = `${playerOne.getUserName()}'s turn`;
     })
 
-    return {};
+    return {updateGrid, updateText};
 })();
 
 // querySelectors to generate players
@@ -117,5 +155,4 @@ const playerTwoName = document.querySelector('#playerTwoName');
 
 let playerOne = Player(playerOneName, 'X'); 
 let playerTwo = Player(playerTwoName, 'O');
-
 
