@@ -1,34 +1,17 @@
-const restartBtn = document.querySelector('#restart');
 
-// gameBoard Factory
-const gameBoard = (() => {
-    // function that generates the grid area
-    const generateGrid = () => {
-        const playGrid = document.querySelector('#playGrid');
-    
-        let iRow = 0;
-        let arrayNum = 0;
-        while (iRow < 3){
-            const row = document.createElement('div');
-            row.className = 'rows';
-            playGrid.appendChild(row);
-    
-            let iColumn = 0;
-            while (iColumn < 3){
-                const column = document.createElement('img');
-                column.className = `columns ${arrayNum}`;
-                column.id = arrayNum;
-                row.appendChild(column);
-                column.addEventListener('mousedown', () => gameFlow.playerAction(column.id));         
-                arrayNum++;
-                iColumn++;
-            }
-        iRow++;
-        };
-    };
+//factory for the gameBoard
+const GameBoard = (() => {
+    let boardState = [                // will use this array to check the board state and declare game state
+    '', '', '',
+    '', '', '',
+    '', '', ''
+    ];
 
-    //function that checks the board state and possible win conditions
-    const checkBoardState = () => {
+    const updateBoardState = (num, input) => {
+        boardState[num] = input;
+    }
+
+    const checkWinState = () => {
         let i = 0;
 
         let playerName = '';
@@ -56,70 +39,83 @@ const gameBoard = (() => {
         }
         i = 0;
     }
-    return {generateGrid, checkBoardState};
+    return {updateBoardState, checkWinState, boardState};
 })();
 
+//factory for the players
+const Player = (userName, symbol) => {
+    const getUserName = () => userName.value;
+    const getSymbol = () => symbol;
+
+    return {getUserName, getSymbol};
+};
+
+//module to control the flow of the game. 
 const gameFlow = (() => {
     let i = 0;
-
     // assigns the turn order based on a simple toggle. this turn order then allows either an X or O to be placed.
-    const turnOrder = () => {
-        let turnText = document.querySelector('#turnTextBox');
-        if ((i % 2) === 0){
-            turnText.textContent = `${playerOne}'s Turn!`;
-            turnTracker = 'X';
+    const turnOrder = (columnID) => {
+        if(GameBoard.boardState === '' && (i % 2) === 0){
+            GameBoard.updateBoardState(columnID, playerOne.getSymbol);
+            
         } else {
-            turnText.textContent = `${playerTwo}'s Turn!`;
-            turnTracker = 'O';
+
         }
         i++;
     }
-    
-    // based on turn order, amends the playgrid div with an "X" or "O". boardstate is checked after each piece is placed.
-    const playerAction = (num) => {
-        if (boardState[num]){
-            return;
-        } else if (turnTracker === 'X'){
-            document.getElementById(num).setAttribute('src', './Icons/x_icon.png');
-            boardState[num] = 'X';
-        } else {
-            document.getElementById(num).setAttribute('src', './Icons/o_icon2.png');
-            boardState[num] = 'O';
-        }
-        gameBoard.checkBoardState();
-        turnOrder();
-    }
-
-    // resets the board
-    const clearBoard = () => {
-        let allGrid = document.querySelectorAll('.columns');
-        allGrid.forEach((item) => {
-            item.setAttribute('src', './Icons/blank.png');
-        })
-        i = 0;
-        boardState = [               
-        '', '', '',
-        '', '', '',
-        '', '', ''
-        ];
-        turnOrder();
-    }
-
-    return {turnOrder, playerAction, clearBoard};
+    return {turnOrder};
 })();
 
-let turnTracker = 'X';      // default is X to start
+// module for displayController
+const displayController = (() => {
+    // function to generate Grid
+    const generateGrid = () => {
+        const playGrid = document.querySelector('#playGrid');
+    
+        let iRow = 0;
+        let arrayNum = 0;
+        while (iRow < 3){
+            const row = document.createElement('div');
+            row.className = 'rows';
+            playGrid.appendChild(row);
+    
+            let iColumn = 0;
+            while (iColumn < 3){
+                const column = document.createElement('img');
+                column.className = `columns ${arrayNum}`;
+                column.id = arrayNum;
+                row.appendChild(column);
+                column.addEventListener('mousedown', () => gameFlow.turnOrder(column.id));         
+                arrayNum++;
+                iColumn++;
+            }
+        iRow++;
+        };
+    }
 
-let boardState = [                // will use this array to check the board state and declare game state
-'', '', '',
-'', '', '',
-'', '', ''
-];
 
-restartBtn.addEventListener('click', gameFlow.clearBoard);
+    // restart game button
+    const restartBtn = document.querySelector('#restart');
+    restartBtn.addEventListener('click', () => {
 
-const playerOne = 'Player One';
-const playerTwo = 'Player Two';
+    });
 
-gameBoard.generateGrid();
-gameFlow.turnOrder();
+    // start game button
+    const startGameBtn = document.querySelector('#startGame');
+    const turnText = document.querySelector('#turnTextBox');
+    startGameBtn.addEventListener('click', () => {
+        generateGrid();
+        turnText.textContent = `${playerOne.getUserName()}'s turn`;
+    })
+
+    return {};
+})();
+
+// querySelectors to generate players
+const playerOneName = document.querySelector('#playerOneName');
+const playerTwoName = document.querySelector('#playerTwoName');
+
+let playerOne = Player(playerOneName, 'X'); 
+let playerTwo = Player(playerTwoName, 'O');
+
+
