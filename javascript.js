@@ -7,8 +7,19 @@ const GameBoard = (() => {
     '', '', ''
     ];
 
+    const boardStateIndexCheck = (columnID) => {
+        return (boardState[columnID]);
+    }
+
     const updateBoardState = (num, input) => {
         boardState[num] = input;
+    }
+
+    const boardStateEmptyCheck = (columnID) => {
+        if (boardState[columnID] === ''){
+            return true;
+        } 
+        return false;
     }
 
     const resetBoardState = () => {
@@ -19,7 +30,7 @@ const GameBoard = (() => {
         ];
     }
 
-    return {updateBoardState, boardState, resetBoardState};
+    return {updateBoardState, boardStateIndexCheck, boardStateEmptyCheck, resetBoardState, boardState};
 })();
 
 //factory for the players
@@ -35,7 +46,7 @@ const gameFlow = (() => {
     let i = 0;
     // assigns the turn order based on a simple toggle. this turn order then allows either an X or O to be placed.
     const turnOrder = (columnID) => {
-        if (GameBoard.boardState[columnID] || winState){
+        if (!GameBoard.boardStateEmptyCheck(columnID) || winState){
             return;
         } else if ((i % 2) === 0){
             GameBoard.updateBoardState(columnID, playerOne.getSymbol());
@@ -58,16 +69,16 @@ const gameFlow = (() => {
         let i = 0;
         let iR = 0;
         while (i < 9){
-            if (GameBoard.boardState[i] === symbol && GameBoard.boardState[i+1] === symbol  && GameBoard.boardState[i+2] === symbol){   //check columns
+            if (GameBoard.boardStateIndexCheck(i) === symbol && GameBoard.boardStateIndexCheck(i+1) === symbol  && GameBoard.boardStateIndexCheck(i+2) === symbol){   //check columns
                 displayController.updateText(playerName);
                 winState = true;
-            } else if (GameBoard.boardState[iR] === symbol && GameBoard.boardState[iR+3] === symbol && GameBoard.boardState[iR+6] === symbol){  //check rows
+            } else if (GameBoard.boardStateIndexCheck(iR) === symbol && GameBoard.boardStateIndexCheck(iR+3) === symbol && GameBoard.boardStateIndexCheck(iR+6) === symbol){  //check rows
                 displayController.updateText(playerName);
                 winState = true;
-            } else if (GameBoard.boardState[0] === symbol && GameBoard.boardState[4] === symbol && GameBoard.boardState[8] === symbol){
+            } else if (GameBoard.boardStateIndexCheck(0) === symbol && GameBoard.boardStateIndexCheck(4) === symbol && GameBoard.boardStateIndexCheck(8) === symbol){
                 displayController.updateText(playerName);
                 winState = true;
-            } else if (GameBoard.boardState[2] === symbol && GameBoard.boardState[4] === symbol && GameBoard.boardState[6] === symbol){
+            } else if (GameBoard.boardStateIndexCheck(2) === symbol && GameBoard.boardStateIndexCheck(4) === symbol && GameBoard.boardStateIndexCheck(6) === symbol){
                 displayController.updateText(playerName);
                 winState = true;
             }
@@ -80,7 +91,7 @@ const gameFlow = (() => {
     const restartGame = () => {
         i = 0;
         winState = false;
-
+        
         let allGrid = document.querySelectorAll('.columns');
         allGrid.forEach((item) => {
             item.setAttribute('src', './Icons/blank.png');
