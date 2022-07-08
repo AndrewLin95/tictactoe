@@ -88,6 +88,7 @@ body{
     display:flex;
     flex-direction: column;  
     justify-content: center;
+    align-items: center;
     width: 15em;
 }
 
@@ -113,15 +114,6 @@ body{
     gap: 0.5em;
 }
 
-
-.left{
-    margin-right: 5em;
-}
-
-.right{
-    margin-left: 5em;
-}
-
 .rows,
 .columns{
     border: solid 1px lightgrey;
@@ -141,7 +133,7 @@ body{
 
 #restart{
     margin: 3vh;
-    display:flex;
+    display: none;
     justify-content: center;
     align-items: center;
     width: 5em;
