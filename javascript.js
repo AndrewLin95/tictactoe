@@ -20,7 +20,7 @@ const GameBoard = () => {
 
     let winState = false;
 
-    const winStateCheck = () => {
+    const getWinState = () => {
         if (winState === true){
             return true;
         }
@@ -49,7 +49,7 @@ const GameBoard = () => {
         i = 0;
     }
 
-    return {updateBoardState, boardStateEmptyCheck, boardState, winStateCheck, checkWinState};
+    return {updateBoardState, boardStateEmptyCheck, boardState, getWinState, checkWinState};
 };
 
 //factory for the players
@@ -64,21 +64,21 @@ const Player = (userName, symbol) => {
 const gameFlow = (() => {
     let i = 0;
     // assigns the turn order based on a simple toggle. this turn order then allows either an X or O to be placed.
-    const turnOrder = (columnID) => {
-        if (!gameBoardObject.boardStateEmptyCheck(columnID) || gameBoardObject.winStateCheck()){
+    const turnOrder = (columnID, oneName, oneSymbol, twoName, twoSymbol) => {
+        if (!gameBoardObject.boardStateEmptyCheck(columnID) || gameBoardObject.getWinState()){
             return;
         } else if ((i % 2) === 0){
-            gameBoardObject.updateBoardState(columnID, playerOne.getSymbol());
-            displayController.updateGrid(columnID, playerOne.getSymbol(), playerTwo.getUserName());
-            gameBoardObject.checkWinState(playerOne.getUserName(), playerOne.getSymbol());
+            gameBoardObject.updateBoardState(columnID, oneSymbol);
+            displayController.updateGrid(columnID, oneSymbol, twoName);
+            gameBoardObject.checkWinState(oneName, oneSymbol);
         } else {
-            gameBoardObject.updateBoardState(columnID, playerTwo.getSymbol());
-            displayController.updateGrid(columnID, playerTwo.getSymbol(), playerOne.getUserName());
-            gameBoardObject.checkWinState(playerTwo.getUserName(), playerTwo.getSymbol());
+            gameBoardObject.updateBoardState(columnID, twoSymbol);
+            displayController.updateGrid(columnID, twoSymbol, oneName);
+            gameBoardObject.checkWinState(twoName, twoSymbol);
         }
         i++;
         
-        if (i === 9 && !winState){
+        if (i === 9 && !gameBoardObject.getWinState()){
             displayController.updateText('draw');
         }
     }
@@ -98,7 +98,7 @@ const gameFlow = (() => {
 // module for displayController
 const displayController = (() => {
     const turnText = document.querySelector('#turnTextBox');
-    
+
     // function to generate Grid
     const generateGrid = () => {
         const playGrid = document.querySelector('#playGrid');
@@ -116,7 +116,7 @@ const displayController = (() => {
                 column.className = `columns ${arrayNum}`;
                 column.id = arrayNum;
                 row.appendChild(column);
-                column.addEventListener('mousedown', () => gameFlow.turnOrder(column.id));         
+                column.addEventListener('mousedown', () => gameFlow.turnOrder(column.id, playerModule.getPOneName(), playerModule.getPOneSymbol(), playerModule.getPTwoName(), playerModule.getPTwoSymbol()));         
                 arrayNum++;
                 iColumn++;
             }
@@ -148,17 +148,24 @@ const displayController = (() => {
     const startGameBtn = document.querySelector('#startGame');
     startGameBtn.addEventListener('click', () => {
         generateGrid();
-        turnText.textContent = `${playerOne.getUserName()}'s turn`;
+        turnText.textContent = `${playerModule.getPOneName()}'s turn`;
     })
 
     return {updateGrid, updateText};
 })();
 
-// querySelectors to generate players
-const playerOneName = document.querySelector('#playerOneName');
-const playerTwoName = document.querySelector('#playerTwoName');
+const playerModule = (() => {
+    const playerOneName = document.querySelector('#playerOneName');
+    let playerOne = Player(playerOneName, 'X'); 
+    const playerTwoName = document.querySelector('#playerTwoName');
+    let playerTwo = Player(playerTwoName, 'O');
 
-let playerOne = Player(playerOneName, 'X'); 
-let playerTwo = Player(playerTwoName, 'O');
+    const getPOneName = () => playerOne.getUserName();
+    const getPOneSymbol = () => playerOne.getSymbol();
+    const getPTwoName = () => playerTwo.getUserName();
+    const getPTwoSymbol = () => playerTwo.getSymbol();
+    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol};
+})();
+
 
 let gameBoardObject = GameBoard();
