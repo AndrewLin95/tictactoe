@@ -83,20 +83,43 @@ body{
     height: 30em;
 }
 
-#playerSelect,
-#scoreBoard{
+.scoreBoard
+{
     display:flex;
     flex-direction: column;  
     justify-content: center;
     width: 15em;
 }
 
-#playerSelect{
-    margin-left: 5em;
+#popUpEnterPlayerContainer,
+#popUpPlayerSelect{
+    align-items: center;
+    flex-direction: column;
+    gap: 1em;
+    width: 30em;
 }
 
-#scoreBoard{
+#popUpPlayerSelect{
+    display: flex;
+}
+
+#popUpEnterPlayerContainer{
+    display: none;
+}
+
+#popUpEnterPlayerInfo{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+
+.left{
     margin-right: 5em;
+}
+
+.right{
+    margin-left: 5em;
 }
 
 .rows,

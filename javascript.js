@@ -146,10 +146,26 @@ const displayController = (() => {
 
     // start game button
     const startGameBtn = document.querySelector('#startGame');
+    const playerOneNameDisplay = document.querySelector('#playerOneNameDisplay');
+    const playerTwoNameDisplay = document.querySelector('#playerTwoNameDisplay');
+
     startGameBtn.addEventListener('click', () => {
+        document.getElementById('popUpEnterPlayerContainer').style.display = 'none';
+        playerOneNameDisplay.textContent = `${playerModule.getPOneName()}'s`;
+        playerTwoNameDisplay.textContent = `${playerModule.getPTwoName()}'s`;
         generateGrid();
         turnText.textContent = `${playerModule.getPOneName()}'s turn`;
     })
+
+    // select player buttons
+    const twoPlayerBtn = document.querySelector('#twoPlayerBtn');
+    const easyAIBtn = document.querySelector('#easyAIBtn');
+    const impossibleAIBtn = document.querySelector('#impossibleAIBtn');
+
+    twoPlayerBtn.addEventListener('click', () => {
+        document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
+        document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+    });
 
     return {updateGrid, updateText};
 })();
