@@ -64,23 +64,31 @@ const Player = (userName, symbol) => {
 const gameFlow = (() => {
     let i = 0;
     // assigns the turn order based on a simple toggle. this turn order then allows either an X or O to be placed.
-    const turnOrder = (columnID, oneName, oneSymbol, twoName, twoSymbol) => {
+    const turnOrder = (columnID, gameType, oneName, oneSymbol, twoName, twoSymbol) => {
         if (!gameBoardObject.boardStateEmptyCheck(columnID) || gameBoardObject.getWinState()){
             return;
         } else if ((i % 2) === 0){
             gameBoardObject.updateBoardState(columnID, oneSymbol);
             displayController.updateGrid(columnID, oneSymbol, twoName);
             gameBoardObject.checkWinState(oneName, oneSymbol);
-        } else {
-            gameBoardObject.updateBoardState(columnID, twoSymbol);
-            displayController.updateGrid(columnID, twoSymbol, oneName);
-            gameBoardObject.checkWinState(twoName, twoSymbol);
-        }
+            if (gameType === 'easy' && !gameBoardObject.getWinState()){
+                playerTwoTurn(playerModule.easyAIAction(gameBoardObject.boardState), twoName, twoSymbol, oneName);//add logic to easy ai module. pass on the boardState through to the function. function will return a position on the array. use that to update everything.
+                i++;
+            };
+        } else if (gameType === 'two'){
+            playerTwoTurn(columnID,twoName, twoSymbol, oneName);
+        } 
         i++;
         
         if (i === 9 && !gameBoardObject.getWinState()){
             displayController.updateText('draw');
         }
+    }
+
+    const playerTwoTurn = (columnID, twoName, twoSymbol, oneName) => {
+        gameBoardObject.updateBoardState(columnID, twoSymbol);
+        displayController.updateGrid(columnID, twoSymbol, oneName);
+        gameBoardObject.checkWinState(twoName, twoSymbol);
     }
 
     const restartGame = () => {
@@ -116,7 +124,7 @@ const displayController = (() => {
                 column.className = `columns ${arrayNum}`;
                 column.id = arrayNum;
                 row.appendChild(column);
-                column.addEventListener('mousedown', () => gameFlow.turnOrder(column.id, playerModule.getPOneName(), playerModule.getPOneSymbol(), playerModule.getPTwoName(), playerModule.getPTwoSymbol()));         
+                column.addEventListener('mousedown', () => gameFlow.turnOrder(column.id, gameType, playerModule.getPOneName(), playerModule.getPOneSymbol(), playerModule.getPTwoName(), playerModule.getPTwoSymbol()));         
                 arrayNum++;
                 iColumn++;
             }
@@ -151,6 +159,7 @@ const displayController = (() => {
 
     startGameBtn.addEventListener('click', () => {
         document.getElementById('popUpEnterPlayerContainer').style.display = 'none';
+        document.getElementById('restart').style.display = 'flex';
         playerOneNameDisplay.textContent = `${playerModule.getPOneName()}'s`;
         playerTwoNameDisplay.textContent = `${playerModule.getPTwoName()}'s`;
         generateGrid();
@@ -160,11 +169,25 @@ const displayController = (() => {
     // select player buttons
     const twoPlayerBtn = document.querySelector('#twoPlayerBtn');
     const easyAIBtn = document.querySelector('#easyAIBtn');
-    const impossibleAIBtn = document.querySelector('#impossibleAIBtn');
+    const hardAIBtn = document.querySelector('#impossibleAIBtn');
+    let gameType = null;
 
     twoPlayerBtn.addEventListener('click', () => {
         document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
         document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+        gameType = 'two';
+    });
+
+    easyAIBtn.addEventListener('click', () => {
+        document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
+        document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+        gameType = 'easy';
+    });
+
+    hardAIBtn.addEventListener('click', () => {
+        document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
+        document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+        gameType = 'hard';
     });
 
     return {updateGrid, updateText};
@@ -180,7 +203,22 @@ const playerModule = (() => {
     const getPOneSymbol = () => playerOne.getSymbol();
     const getPTwoName = () => playerTwo.getUserName();
     const getPTwoSymbol = () => playerTwo.getSymbol();
-    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol};
+
+    const easyAIAction = (boardState) => {
+        let randNum = Math.floor(Math.random()*9);
+        let i = 0;
+        while (i < 8){
+            if (!boardState[randNum]){
+                console.log(randNum)
+                console.log(boardState)
+                return randNum;
+            }
+            randNum = Math.floor(Math.random()*9);
+            i++;
+        }
+    }
+
+    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol, easyAIAction};
 })();
 
 
