@@ -2,8 +2,8 @@
 //factory for the gameBoard
 const GameBoard = () => {
     let boardState = [                // will use this array to check the board state and declare game state
-    'O', 'O', '',
-    'X', '', '',
+    '', '', '',
+    '', '', '',
     '', '', ''
     ];
 
