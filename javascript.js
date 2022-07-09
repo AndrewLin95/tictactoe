@@ -2,8 +2,8 @@
 //factory for the gameBoard
 const GameBoard = () => {
     let boardState = [                // will use this array to check the board state and declare game state
-    '', '', '',
-    '', '', '',
+    'O', 'O', '',
+    'X', '', '',
     '', '', ''
     ];
 
@@ -26,22 +26,23 @@ const GameBoard = () => {
         }
     }
 
-    const checkWinState = (playerName, symbol) => {
+    const toggleWinState = () => {
+        displayController.updateText(playerName);
+        winState = true;
+    }
+
+    const checkWinState = (currentBoard, playerName, symbol) => {
         let i = 0;
         let iR = 0;
         while (i < 9){
-            if (boardState[i] === symbol && boardState[i+1] === symbol  && boardState[i+2] === symbol){   //check columns
-                displayController.updateText(playerName);
-                winState = true;
-            } else if (boardState[iR] === symbol && boardState[iR+3] === symbol && boardState[iR+6] === symbol){  //check rows
-                displayController.updateText(playerName);
-                winState = true;
-            } else if (boardState[0] === symbol && boardState[4] === symbol && boardState[8] === symbol){
-                displayController.updateText(playerName);
-                winState = true;
-            } else if (boardState[2] === symbol && boardState[4] === symbol && boardState[6] === symbol){
-                displayController.updateText(playerName);
-                winState = true;
+            if (currentBoard[i] === symbol && currentBoard[i+1] === symbol  && currentBoard[i+2] === symbol){   //check columns
+                return true;
+            } else if (currentBoard[iR] === symbol && currentBoard[iR+3] === symbol && currentBoard[iR+6] === symbol){  //check rows
+                return true;
+            } else if (currentBoard[0] === symbol && currentBoard[4] === symbol && currentBoard[8] === symbol){
+                return true;
+            } else if (currentBoard[2] === symbol && currentBoard[4] === symbol && currentBoard[6] === symbol){
+                return true;
             }
             i+=3;
             iR++;
@@ -49,12 +50,12 @@ const GameBoard = () => {
         i = 0;
     }
 
-    return {updateBoardState, boardStateEmptyCheck, boardState, getWinState, checkWinState};
+    return {updateBoardState, boardStateEmptyCheck, boardState, getWinState, toggleWinState, checkWinState};
 };
 
 //factory for the players
 const Player = (userName, symbol) => {
-    const getUserName = () => userName.value;
+    const getUserName = () => userName;
     const getSymbol = () => symbol;
 
     return {getUserName, getSymbol};
@@ -70,11 +71,16 @@ const gameFlow = (() => {
         } else if ((i % 2) === 0){
             gameBoardObject.updateBoardState(columnID, oneSymbol);
             displayController.updateGrid(columnID, oneSymbol, twoName);
-            gameBoardObject.checkWinState(oneName, oneSymbol);
+            if (gameBoardObject.checkWinState(gameBoardObject.boardState, oneName, oneSymbol)){
+                gameBoardObject.toggleWinState();
+            };
             if (gameType === 'easy' && !gameBoardObject.getWinState()){
                 playerTwoTurn(playerModule.easyAIAction(gameBoardObject.boardState), twoName, twoSymbol, oneName);//add logic to easy ai module. pass on the boardState through to the function. function will return a position on the array. use that to update everything.
                 i++;
             };
+            if (gameType === 'hard' && !gameBoardObject.getWinState()){
+                playerModule.hardAIAction(gameBoardObject.boardState);
+            }
         } else if (gameType === 'two'){
             playerTwoTurn(columnID,twoName, twoSymbol, oneName);
         } 
@@ -88,7 +94,7 @@ const gameFlow = (() => {
     const playerTwoTurn = (columnID, twoName, twoSymbol, oneName) => {
         gameBoardObject.updateBoardState(columnID, twoSymbol);
         displayController.updateGrid(columnID, twoSymbol, oneName);
-        gameBoardObject.checkWinState(twoName, twoSymbol);
+        gameBoardObject.checkWinState(gameBoardObject.boardState, twoName, twoSymbol);
     }
 
     const restartGame = () => {
@@ -158,6 +164,7 @@ const displayController = (() => {
     const playerTwoNameDisplay = document.querySelector('#playerTwoNameDisplay');
 
     startGameBtn.addEventListener('click', () => {
+        playerModule.getPlayerName();
         document.getElementById('popUpEnterPlayerContainer').style.display = 'none';
         document.getElementById('restart').style.display = 'flex';
         playerOneNameDisplay.textContent = `${playerModule.getPOneName()}'s`;
@@ -181,23 +188,40 @@ const displayController = (() => {
     easyAIBtn.addEventListener('click', () => {
         document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
         document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+        document.getElementById('playerTwoPopUp').style.display = 'none';
         gameType = 'easy';
     });
 
     hardAIBtn.addEventListener('click', () => {
         document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
         document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+        document.getElementById('playerTwoPopUp').style.display = 'none';
         gameType = 'hard';
     });
 
-    return {updateGrid, updateText};
+    const pushGameType = () => {
+        return gameType;
+    }
+
+    return {updateGrid, updateText, pushGameType};
 })();
 
 const playerModule = (() => {
     const playerOneName = document.querySelector('#playerOneName');
-    let playerOne = Player(playerOneName, 'X'); 
     const playerTwoName = document.querySelector('#playerTwoName');
-    let playerTwo = Player(playerTwoName, 'O');
+    let playerOne = '';
+    let playerTwo = '';
+    
+    function getPlayerName(){
+        playerOne = Player(playerOneName.value, 'X'); 
+        if (displayController.pushGameType() === 'easy'){
+            playerTwo = Player('Easy Bot', 'O');
+        } else if (displayController.pushGameType() === 'hard'){
+            playerTwo = Player('Hard Bot', 'O');
+        } else {
+            playerTwo = Player(playerTwoName.value, 'O');
+        }
+    }
 
     const getPOneName = () => playerOne.getUserName();
     const getPOneSymbol = () => playerOne.getSymbol();
@@ -209,8 +233,6 @@ const playerModule = (() => {
         let i = 0;
         while (i < 8){
             if (!boardState[randNum]){
-                console.log(randNum)
-                console.log(boardState)
                 return randNum;
             }
             randNum = Math.floor(Math.random()*9);
@@ -218,7 +240,37 @@ const playerModule = (() => {
         }
     }
 
-    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol, easyAIAction};
+    //gameBoardObject.checkWinState(oneName, oneSymbol);
+
+    const minMax = (boardState, columnId) => {
+        let tempBoard = boardState;
+        tempBoard[columnId] = 'O';
+        if (gameBoardObject.checkWinState(tempBoard, 'Hard Bot', 'O')){
+            tempBoard[columnId] = '';
+            return 10;
+        } else {
+            tempBoard[columnId] = '';
+            return 0;
+        }
+    }
+
+    const hardAIAction = (boardState) => {
+        console.log(boardState);
+        let moves = [];
+        let value = [];
+
+        let i = 0;
+        while (i < 9) {
+            if (boardState[i] === ''){
+                value.push(minMax(boardState, i));
+                moves.push(i);
+            };
+            i++;
+        }
+    };
+
+
+    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol, easyAIAction, getPlayerName, hardAIAction};
 })();
 
 
