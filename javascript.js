@@ -26,12 +26,12 @@ const GameBoard = () => {
         }
     }
 
-    const toggleWinState = () => {
+    const toggleWinState = (playerName) => {
         displayController.updateText(playerName);
         winState = true;
     }
 
-    const checkWinState = (currentBoard, playerName, symbol) => {
+    const checkWinState = (currentBoard, symbol) => {
         let i = 0;
         let iR = 0;
         while (i < 9){
@@ -71,8 +71,8 @@ const gameFlow = (() => {
         } else if ((i % 2) === 0){
             gameBoardObject.updateBoardState(columnID, oneSymbol);
             displayController.updateGrid(columnID, oneSymbol, twoName);
-            if (gameBoardObject.checkWinState(gameBoardObject.boardState, oneName, oneSymbol)){
-                gameBoardObject.toggleWinState();
+            if (gameBoardObject.checkWinState(gameBoardObject.boardState, oneSymbol)){
+                gameBoardObject.toggleWinState(oneName);
             };
             if (gameType === 'easy' && !gameBoardObject.getWinState()){
                 playerTwoTurn(playerModule.easyAIAction(gameBoardObject.boardState), twoName, twoSymbol, oneName);//add logic to easy ai module. pass on the boardState through to the function. function will return a position on the array. use that to update everything.
@@ -95,6 +95,9 @@ const gameFlow = (() => {
         gameBoardObject.updateBoardState(columnID, twoSymbol);
         displayController.updateGrid(columnID, twoSymbol, oneName);
         gameBoardObject.checkWinState(gameBoardObject.boardState, twoName, twoSymbol);
+        if (gameBoardObject.checkWinState(gameBoardObject.boardState, twoSymbol)){
+            gameBoardObject.toggleWinState(twoName);
+        };
     }
 
     const restartGame = () => {
