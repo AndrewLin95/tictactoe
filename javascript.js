@@ -243,37 +243,7 @@ const playerModule = (() => {
         }
     }
 
-    //gameBoardObject.checkWinState(oneName, oneSymbol);
-
-    const minMax = (boardState, columnId) => {
-        let tempBoard = boardState;
-        tempBoard[columnId] = 'O';
-        if (gameBoardObject.checkWinState(tempBoard, 'Hard Bot', 'O')){
-            tempBoard[columnId] = '';
-            return 10;
-        } else {
-            tempBoard[columnId] = '';
-            return 0;
-        }
-    }
-
-    const hardAIAction = (boardState) => {
-        console.log(boardState);
-        let moves = [];
-        let value = [];
-
-        let i = 0;
-        while (i < 9) {
-            if (boardState[i] === ''){
-                value.push(minMax(boardState, i));
-                moves.push(i);
-            };
-            i++;
-        }
-    };
-
-
-    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol, easyAIAction, getPlayerName, hardAIAction};
+    return {getPOneName, getPOneSymbol, getPTwoName, getPTwoSymbol, easyAIAction, getPlayerName};
 })();
 
 
