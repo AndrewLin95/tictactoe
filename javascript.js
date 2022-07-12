@@ -195,12 +195,12 @@ const displayController = (() => {
         gameType = 'easy';
     });
 
-    hardAIBtn.addEventListener('click', () => {
-        document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
-        document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
-        document.getElementById('playerTwoPopUp').style.display = 'none';
-        gameType = 'hard';
-    });
+    // hardAIBtn.addEventListener('click', () => {
+    //     document.getElementById('popUpEnterPlayerContainer').style.display = 'flex';
+    //     document.getElementById('popUpPlayerSelectContainer').style.display = 'none';
+    //     document.getElementById('playerTwoPopUp').style.display = 'none';
+    //     gameType = 'hard';
+    // });
 
     const pushGameType = () => {
         return gameType;
